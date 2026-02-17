@@ -1,18 +1,45 @@
-# Salesforce DX Project: Next Steps
+# Apex Cursors POC -- Spring '26 (API v66.0)
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+Working demo of **Database.Cursor** and **Database.PaginationCursor** for paginating Account records in LWC.
 
-## How Do You Plan to Deploy Your Changes?
+## What's Inside
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+| File | Purpose |
+|------|---------|
+| `TFB_StandardCursorController.cls` | Apex controller using Database.Cursor (offset-based, random access) |
+| `TFB_PaginationCursorController.cls` | Apex controller using Database.PaginationCursor (index-based, skips deleted records) |
+| `tfbStandardCursorDemo/` | LWC component wired to the standard cursor controller |
+| `tfbPaginationCursorDemo/` | LWC component wired to the pagination cursor controller |
 
-## Configure Your Salesforce DX Project
+## Prerequisites
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+- Salesforce org on **Spring '26** (API v66.0)
+- Account records in the org (20+ recommended to see pagination in action)
 
-## Read All About It
+## Deploy
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+```bash
+sf project deploy start \
+  --source-dir force-app/main/default/classes/TFB_StandardCursorController.cls \
+  --source-dir force-app/main/default/classes/TFB_PaginationCursorController.cls \
+  --source-dir force-app/main/default/lwc/tfbStandardCursorDemo \
+  --source-dir force-app/main/default/lwc/tfbPaginationCursorDemo \
+  --target-org yourOrgAlias
+```
+
+Then add the components to any Lightning App Page via App Builder.
+
+## Cursor vs PaginationCursor
+
+| | Database.Cursor | Database.PaginationCursor |
+|---|---|---|
+| Max rows | 50M | 100K |
+| Daily limit | 10,000/org | 200,000/org |
+| Navigation | Random access (offset) | Sequential (nextIndex) |
+| Deleted records | May return fewer per page | Skips, always returns full page |
+| Best for | Backend processing, Queueable chains | UI pagination, record lists |
+
+## References
+
+- [Apex Cursors Documentation](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_cursors.htm)
+- [Spring '26 Developer's Guide](https://developer.salesforce.com/blogs/2026/01/developers-guide-to-the-spring-26-release)
