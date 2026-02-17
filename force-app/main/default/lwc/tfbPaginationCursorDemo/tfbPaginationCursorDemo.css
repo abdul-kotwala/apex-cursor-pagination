@@ -1,0 +1,27 @@
+.content-container {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-bar {
+    padding: 0.75rem 0;
+    border-top: 1px solid #dddbda;
+}
+
+.page-indicator {
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.info-banner {
+    border-left: 4px solid #9050e9;
+    border-radius: 0.25rem;
+}
+
+.metadata-row {
+    padding: 0.5rem 0;
+    border-top: 1px dashed #e5e5e5;
+}

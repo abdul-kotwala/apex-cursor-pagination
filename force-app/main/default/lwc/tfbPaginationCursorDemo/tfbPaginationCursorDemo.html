@@ -1,0 +1,127 @@
+<template>
+    <lightning-card title="Database.PaginationCursor - Pagination Cursor Demo" icon-name="standard:account">
+        <div class="slds-var-p-around_medium">
+
+            <!-- Description Badge -->
+            <div class="slds-var-m-bottom_medium">
+                <div class="info-banner slds-box slds-theme_shade slds-var-p-around_small">
+                    <p class="slds-text-body_small">
+                        <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info" class="slds-var-m-right_xx-small"></lightning-icon>
+                        <strong>Database.PaginationCursor</strong> &mdash; Designed for UI pagination.
+                        Automatically skips deleted records to always return a full page of results.
+                        Uses index-based sequential navigation (getNextIndex). Supports up to 100K rows
+                        with a higher daily limit (200K instances/org/day).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Error -->
+            <template lwc:if={errorMessage}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-var-m-bottom_medium" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <h2>{errorMessage}</h2>
+                </div>
+            </template>
+
+            <!-- Content Area: Loading replaces table cleanly -->
+            <template lwc:if={isLoading}>
+                <div class="content-container slds-is-relative">
+                    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                </div>
+            </template>
+            <template lwc:elseif={hasRecords}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={records}
+                    columns={columns}
+                    hide-checkbox-column
+                    show-row-number-column
+                    row-number-offset={rowNumberOffset}
+                >
+                </lightning-datatable>
+            </template>
+            <template lwc:else>
+                <div class="content-container slds-grid slds-grid_align-center slds-grid_vertical-align-center">
+                    <p class="slds-text-body_regular slds-text-color_weak">No Account records found.</p>
+                </div>
+            </template>
+
+            <!-- Pagination Controls: Stays visible once loaded, buttons disabled while loading -->
+            <template lwc:if={showPagination}>
+                <div class="slds-var-m-top_medium">
+                    <div class="pagination-bar slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div class="slds-col">
+                            <span class="slds-text-body_small slds-text-color_weak">{recordCountInfo}</span>
+                        </div>
+                        <div class="slds-col slds-grid slds-grid_align-center slds-gutters_xx-small">
+                            <lightning-button
+                                label="First"
+                                icon-name="utility:jump_to_left"
+                                onclick={handleFirst}
+                                disabled={isPrevDisabled}
+                                variant="neutral"
+                                class="slds-var-m-right_xx-small"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Previous"
+                                icon-name="utility:chevronleft"
+                                onclick={handlePrevious}
+                                disabled={isPrevDisabled}
+                                variant="neutral"
+                                class="slds-var-m-right_xx-small"
+                            ></lightning-button>
+                            <span class="slds-var-p-horizontal_small slds-align-middle page-indicator">
+                                {pageInfo}
+                            </span>
+                            <lightning-button
+                                label="Next"
+                                icon-name="utility:chevronright"
+                                icon-position="right"
+                                onclick={handleNext}
+                                disabled={isNextDisabled}
+                                variant="neutral"
+                                class="slds-var-m-left_xx-small"
+                            ></lightning-button>
+                            <lightning-button
+                                label="Last"
+                                icon-name="utility:jump_to_right"
+                                icon-position="right"
+                                onclick={handleLast}
+                                disabled={isNextDisabled}
+                                variant="neutral"
+                                class="slds-var-m-left_xx-small"
+                            ></lightning-button>
+                        </div>
+                        <div class="slds-col slds-text-align_right">
+                            <span class="slds-badge slds-badge_lightest">
+                                {recordsReturned} records on this page
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Row: Deleted rows info and tracked pages -->
+                    <div class="metadata-row slds-grid slds-grid_align-spread slds-var-m-top_small">
+                        <div class="slds-col">
+                            <template lwc:if={showDeletedRowsBadge}>
+                                <span class="slds-badge slds-theme_warning">
+                                    <lightning-icon icon-name="utility:warning" size="xx-small" alternative-text="Warning" class="slds-var-m-right_xx-small"></lightning-icon>
+                                    {deletedRowsInfo}
+                                </span>
+                            </template>
+                            <template lwc:else>
+                                <span class="slds-badge slds-badge_lightest">
+                                    <lightning-icon icon-name="utility:success" size="xx-small" alternative-text="OK" class="slds-var-m-right_xx-small"></lightning-icon>
+                                    No deleted rows skipped
+                                </span>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-text-align_right">
+                            <span class="slds-text-body_small slds-text-color_weak">{trackedPagesInfo}</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>
